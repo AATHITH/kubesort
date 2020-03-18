@@ -1,4 +1,4 @@
-## Why you need `kubesort`:
+# Why you need `kubesort`:
 `kubesort` helps you sort the results from `kubectl get` in an easy way.
 
 You don't have to type `kubectl --sort-by=.status.containerStatuses[0].restartcount get po` to sort the pod by their STATUS, just type `kubesort status` that's it.
@@ -78,7 +78,7 @@ hello-app-5f9d7479bd-kc4kr   1/1     Running   0          2d6h
 1) As for now you can only sort for `kubectl get pod`.
 2) You need bash in your system.(will add more ways to install in upcomming versions).
 
-### v0.1.0:
+### v0.1.0 Release notes:
 1) Sort by name, status, restarts, age, ip and node for pod.
 2) Sort across Namespaces for pod.
 ### v0.2.0 roadmap:
