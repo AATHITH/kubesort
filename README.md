@@ -30,3 +30,21 @@ Since kubectx/kubens are written in Bash, you should be able to install them to 
                   namespace_name   # kubectl --sort-by=option get po -n namespace_name
 ```
 ## Example:
+
+### v0.1.0 Limitations:
+1) As for now you can only sort for `kubectl get pod`.
+2) You need bash in your system.(will add more ways to install in upcomming versions).
+
+### v0.1.0:
+1) Sort by name, status, restarts, age, ip and node for pod.
+2) Sort across Namespaces for pod.
+### v0.2.0 roadmap:
+1) Sort for resource Deployments, services, namespaces will be included.
+2) Bash auto-completion will be included.
+3) more install options.
+
+### Tried and Tested:
+In k8: v1.15<br>
+   kubectl: v1.15<br>
+   ubuntu: 18.04<br>
+   bash: v4.4<br>
