@@ -41,7 +41,7 @@ else
   cat << EOF
   kubesort sortby namespace_name
  
-  sortby        : name      # kubectl --sort-by=.metadata.name get po
+          sortby: name      # kubectl --sort-by=.metadata.name get po
                   status    # kubectl --sort-by=.status.phase get po
                   restarts  # kubectl --sort-by=.status.containerStatuses[0].restartcount get po
                   age       # kubectl --sort-by=.status.startTime get po
