@@ -4,7 +4,7 @@ Linux
 Since kubectx/kubens are written in Bash, you should be able to install them to any POSIX environment that has Bash installed.
 
 1) Download the kubesort scripts:<br>
-   `sudo git clone https://github.com/aathith/kubernetes/kubesort/kubesort /path/kubesort`
+   `sudo git clone https://github.com/aathith/kubesort /path/kubesort`
 2) Make the script executable:<br>
    `chmod +x /path/kubesort`
 3) Create symlinks to kubesort:<br>
