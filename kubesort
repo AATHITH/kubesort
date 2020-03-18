@@ -23,7 +23,6 @@ arg1[node]=".spec.nodeName"
 if [ "$#" -eq 1 ];
 then
   option=${arg1[$cmd]}
-  echo "kubectl --sort-by=$option get po"
   kubectl --sort-by=$option get po
 
 elif [ "$#" -eq 2 ];
@@ -33,10 +32,8 @@ then
 
   if [ $2 = "all" ];
   then
-  echo  "kubectl --sort-by=$option get po --all-namespaces"
     kubectl --sort-by=$option get po --all-namespaces
   else
-  echo  "kubectl --sort-by=$option get po -n $namespace"
     kubectl --sort-by=$option get po -n $namespace
   fi
 
