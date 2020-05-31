@@ -1,0 +1,51 @@
+#!/bin/bash
+
+#
+#
+# Maintainer: AATHITH_RAJENDRAN
+# Project: https://github.com/AATHITH/kubernetes/kubesort
+# version: 0.2.0
+#
+#
+
+cmd=$2
+option3=$3
+if [ "$#" -eq 2 ];
+then
+  option3=default
+  case "$1" in
+  pod|pods|po)
+     declare -A arg
+     arg[name]=".metadata.name"
+     arg[status]=".status.phase"
+     arg[restarts]=".status.containerStatuses[0].restartCount"
+     arg[age]=".status.startTime"
+     arg[ip]=".status.podIP"
+     arg[node]=".spec.nodeName"
+     option1="pod"
+     option2=${arg[$cmd]}
+  ;;
+  deploy|deployments|deployment)
+     declare -A arg
+     arg[name]=".metadata.name"
+     arg[uptodate]=".status.updatedReplicas"
+     arg[available]=".metadata.availableReplicas"
+     arg[age]=".metadata.creationTimestamp"
+     arg[containers]=".spec.template.spec.containers[*].name"
+     arg[images]=".spec.template.spec.containers[*].image"
+     option1="deployment"
+     option2=${arg[$cmd]}
+  ;;
+  svc|service|services)
+     declare -A arg
+     arg[name]=".metadata.name"
+     arg[type]=".spec.type"
+     arg[clusterip]=".spec.clusterIP"
+     arg[port]=".spec.ports[*].port"
+     arg[age]=".metadata.creationTimestamp"
+     option1="service"
+     option2=${arg[$cmd]}
+  ;;
+  esac
+
+fi
