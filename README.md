@@ -4,7 +4,7 @@
 * `kubectl` has its own `--sort-by=json-path` feature for sorting but `kubesort` will make the sorting easier.
 ## Installation:
 Linux
-Since kubectx/kubens are written in Bash, you should be able to install them to any POSIX environment that has Bash installed.
+Since kubeort is written in Bash, you should be able to install them to any POSIX environment that has Bash installed.
 
 1) Download the kubesort scripts:<br>
    `sudo git clone https://github.com/aathith/kubesort /path/kubesort`
