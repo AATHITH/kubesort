@@ -42,7 +42,7 @@ AVAILABLE OPTIONS:
 ```
 ## Samples
 
-<details><summary>Sorting Pod:</summary>
+<details><summary>Sorting Pod</summary>
 <p>
 
 
@@ -92,10 +92,8 @@ hello-app-5f9d7479bd-kc4kr   1/1     Running   0          2d6h
 ```
 </p>
 </details>
-<details><summary>Sorting Deployments:</summary>
+<details><summary>Sorting Deployments</summary>
 <p>
-
-
 
 ```
 root@k8-master-01:~# kubesort deployment name
@@ -134,6 +132,40 @@ coredns                                 2/2     2            2           169d   
 digitalocean-cloud-controller-manager   1/1     1            1           168d   digitalocean-cloud-controller-manager   digitalocean/digitalocean-cloud-controller-manager:v0.1.6   app=digitalocean-cloud-controller-manager
 metrics-server                          1/1     1            1           151d   metrics-server                          k8s.gcr.io/metrics-server-amd64:v0.3.6                      k8s-app=metrics-server
 
+```
+</p>
+</details>
+<details><summary>Sorting Service</summary>
+<p>
+
+```
+root@k8-master-01:~# kubesort svc type
+NAME              TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                         AGE    SELECTOR
+kubernetes        ClusterIP   10.96.0.1        <none>        443/TCP                         169d   <none>
+alert-checker     NodePort    10.110.87.73     <none>        8080:31080/TCP                  155d   app=alert-checker
+prom-trail        NodePort    10.97.208.221    <none>        8080:32445/TCP,1234:32446/TCP   115d   app=prom-trail
+prometheus        NodePort    10.98.222.241    <none>        9090:31976/TCP                  117d   app=prometheus-server
+
+root@k8-master-01:~# kubesort svc age kube-system
+NAME             TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                  AGE    SELECTOR
+kube-dns         ClusterIP   10.96.0.10       <none>        53/UDP,53/TCP,9153/TCP   169d   k8s-app=kube-dns
+tiller-deploy    ClusterIP   10.108.104.169   <none>        44134/TCP                165d   app=helm,name=tiller
+metrics-server   ClusterIP   10.98.220.21     <none>        443/TCP                  162d   k8s-app=metrics-server
+kubelet          ClusterIP   None             <none>        10250/TCP                117d   <none>
+   
+root@k8-master-01:~# kubesort svc clusterip all
+NAMESPACE              NAME                        TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                         AGE    SELECTOR  
+default                kubernetes                  ClusterIP   10.96.0.1        <none>        443/TCP                         169d   <none>
+kube-system            kube-dns                    ClusterIP   10.96.0.10       <none>        53/UDP,53/TCP,9153/TCP          169d   k8s-app=kube-dns
+default                prom-trail                  NodePort    10.97.208.221    <none>        8080:32445/TCP,1234:32446/TCP   115d   app=prom-trail
+kubernetes-dashboard   kubernetes-dashboard        NodePort    10.98.9.79       <none>        443:30402/TCP                   57d    k8s-app=kubernetes-dashboard
+kube-system            metrics-server              ClusterIP   10.98.220.21     <none>        443/TCP                         162d   k8s-app=metrics-server
+default                prometheus                  NodePort    10.98.222.241    <none>        9090:31976/TCP                  117d   app=prometheus-server
+kube-system            tiller-deploy               ClusterIP   10.108.104.169   <none>        44134/TCP                       165d   app=helm,name=tiller
+kubernetes-dashboard   dashboard-metrics-scraper   ClusterIP   10.108.179.217   <none>        8000/TCP                        57d    k8s-app=dashboard-metrics-scraper
+default                alert-checker               NodePort    10.110.87.73     <none>        8080:31080/TCP                  155d   app=alert-checker
+nginx-ingress          nginx-ingress               NodePort    10.110.160.112   <none>        80:31372/TCP,443:31289/TCP      57d    app=nginx-ingress
+kube-system            kubelet                     ClusterIP   None             <none>        10250/TCP                       117d   <none>
 ```
 </p>
 </details>
