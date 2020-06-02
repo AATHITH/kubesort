@@ -91,7 +91,6 @@ esac
 case "$#" in
      2)
      option3=default
-     echo $option1 $option2 $option3 1
      kubectl get $option1 --sort-by=$option2 -n $option3 -o wide
      ;;
 
@@ -99,11 +98,9 @@ case "$#" in
      if [ $3 = "all" ];
      then
         option3="--all-namespaces"
-        echo $option1 $option2 $option3 2
         kubectl get $option1 --sort-by=$option2 $option3 -o wide
      else
         option3=$3
-        echo $option1 $option2 $option3 3
         kubectl get $option1 --sort-by=$option2 -n $option3 -o wide
      fi
      ;;
