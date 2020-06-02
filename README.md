@@ -40,7 +40,7 @@ AVAAIABLE OPTIONS:
                         option3: namespace-name or all
 ```
 <details>
-<summary>## Samples:</summary>
+<summary>Samples:</summary>
 <br>
 
 </details>
