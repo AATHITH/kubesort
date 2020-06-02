@@ -40,8 +40,49 @@ AVAAIABLE OPTIONS:
                         option3: namespace-name or all
 ```
 <details>
-<summary>Samples:</summary>
+<summary>Sorting Pod Samples:</summary>
 <br>
+root@k8-master-01:~/kubesort# kubesort restarts kube-system
+NAME                                                     READY   STATUS    RESTARTS   AGE
+etcd-k8-master-01                                        1/1     Running   0          58d
+tiller-deploy-688ddc6c9-h6424                            1/1     Running   0          26d
+kube-apiserver-k8-master-01                              1/1     Running   0          58d
+kube-controller-manager-k8-master-01                     1/1     Running   1          58d
+kube-scheduler-k8-master-01                              1/1     Running   1          58d
+kube-proxy-sclt9                                         1/1     Running   2          56d
+kube-flannel-ds-amd64-l579g                              1/1     Running   2          56d
+kube-proxy-l592g                                         1/1     Running   7          93d
+coredns-5c98db65d4-tw75g                                 1/1     Running   8          60d
+kube-flannel-ds-amd64-8krvm                              1/1     Running   9          93d
+metricbeat-5rcb4                                         1/1     Running   13         88d
+kube-proxy-mlnrc                                         1/1     Running   13         93d
+kube-flannel-ds-amd64-lbxbr                              1/1     Running   14         93d
+filebeat-9hh95                                           1/1     Running   55         23d
+
+root@k8-master-01:~/kubesort# kubesort restart kubernetes-dashboard
+NAME                                         READY   STATUS    RESTARTS   AGE
+dashboard-metrics-scraper-6c554969c6-8x2fc   1/1     Running   0          40d
+kubernetes-dashboard-56c5f95c6b-8c89b        1/1     Running   3          40d
+
+root@k8-master-01:~/kubesort# kubesort age all
+NAMESPACE              NAME                                                     READY   STATUS    RESTARTS   AGE
+kube-system            kube-proxy-l592g                                         1/1     Running   7          93d
+kube-system            metricbeat-5rcb4                                         1/1     Running   13         88d
+kube-system            etcd-k8-master-01                                        1/1     Running   0          58d
+kube-system            coredns-5c98db65d4-tw75g                                 1/1     Running   8          60d
+kubernetes-dashboard   kubernetes-dashboard-56c5f95c6b-8c89b                    1/1     Running   3          40d
+kubernetes-dashboard   dashboard-metrics-scraper-6c554969c6-8x2fc               1/1     Running   0          40d
+my-prometheus          prometheus-operator-5bcd9f9d5c-9kwvg                     1/1     Running   0          35d
+kube-system            filebeat-7wg6k                                           1/1     Running   55         23d
+default                prometheus-784586f976-fq6q8                              1/1     Running   0          9d
+dev                    hello-app-5f9d7479bd-kc4kr                               1/1     Running   0          2d6h
+olm                    catalog-operator-5bdf7fc7b-52qhw                         1/1     Running   0          5h21m
+
+root@k8-master-01:~/kubesort# kubesort name dev
+NAME                         READY   STATUS    RESTARTS   AGE
+hello-app-5f9d7479bd-5mzmc   1/1     Running   0          2d6h
+hello-app-5f9d7479bd-db9s2   1/1     Running   0          2d6h
+hello-app-5f9d7479bd-kc4kr   1/1     Running   0          2d6h
 
 </details>
 
