@@ -8,9 +8,6 @@
 #
 #
 
-  GNU nano 2.9.3                                                                                                                                                                                                                                                                                                       kubesort/kubesort                                                                                                                                                                                                                                                                                                                  
-
-#!/bin/bash
 
 cmd=$2
 option3=default
@@ -47,29 +44,6 @@ service () {
      option1="service"
      option2=${arg[$cmd]}
 }
-namespace () {
-     declare -A arg
-     arg[name]=".metadata.name"
-     arg[status]=".status.phase"
-     arg[age]=".metadata.creationTimestamp"
-     option1="namespace"
-     option2=${arg[$cmd]}
-}
-node () {
-     declare -A arg
-     arg[name]=".metadata.name"
-     arg[status]=".status.phase"
-#     arg[role]=""
-     arg[age]=".metadata.creationTimestamp"
-     arg[version]=".status.nodeInfo.kubeletVersion"
-     arg[internalIP]=".status.addresses[?(@.type=="InternalIP")].address}"
-#     arg[externalIP]=""
-     arg[osimage]=".status.nodeInfo.osImage"
-     arg[kernelversion]=".status.nodeInfo.kernelVersion"
-     arg[cri]=".status.nodeInfo.containerRuntimeVersion"
-     option1="node"
-     option2=${arg[$cmd]}
-}
 help () {
 cat << EOF
    Missing something? need Help?
@@ -96,21 +70,19 @@ exit
 
 
 case "$1" in
+  
   pod|pods|po)
     pod
   ;;
+  
   deploy|deployments|deployment)
     deployment
   ;;
+  
   svc|service|services)
     service
   ;;
-  namespaces|ns)
-    namespace
-  ;;
-  node|nodes)
-    node
-  ;;
+
   *)
     help
   ;;
