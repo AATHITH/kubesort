@@ -14,6 +14,7 @@ This a Bash Script that will help you forget the kubectl's default, difficult to
 Linux
 Since kubesort is written in Bash, you should be able to install them to any POSIX environment that has Bash installed.
 
+
 1) Download the kubesort scripts:<br>
    `sudo git clone https://github.com/aathith/kubesort /path/kubesort`
 2) Make the script executable:<br>
