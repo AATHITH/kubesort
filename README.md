@@ -7,7 +7,7 @@ This a Bash Script that will help you forget the kubectl's default, difficult to
 
 1) It's simple
 2) Helps you sort the results from `kubectl` in an easy way.
-3) You don't have to type `kubectl --sort-by=.status.containerStatuses[0].restartcount get po` to sort the pod by their STATUS, just type `kubesort po restarts` that's it.
+3) You don't have to type `kubectl --sort-by=.status.containerStatuses[0].restartcount get po` to sort the pod by their `RESTART` count, just type `kubesort po restarts` that's it.
 
 
 ## Installation:
