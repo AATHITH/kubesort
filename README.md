@@ -92,7 +92,51 @@ hello-app-5f9d7479bd-kc4kr   1/1     Running   0          2d6h
 ```
 </p>
 </details>
+<details><summary>Sorting Deployments:</summary>
+<p>
 
+
+
+```
+root@k8-master-01:~# kubesort deployment name
+NAME              READY   UP-TO-DATE   AVAILABLE   AGE    CONTAINERS        IMAGES                                      SELECTOR
+alert-checker     1/1     1            1           155d   alert-checker     aathith/testing:alert-checker               app=alert-checker
+prom-trail        1/1     1            1           113d   prom-trail        aathith/testing:prometheus-url-annotation   app=prom-trail
+prometheus        1/1     1            1           115d   prometheus        prom/prometheus                             app=prometheus-server
+
+root@k8-master-01:~# kubesort deployment name all
+NAMESPACE              NAME                                    READY   UP-TO-DATE   AVAILABLE   AGE    CONTAINERS                              IMAGES                                                      SELECTOR
+default                alert-checker                           1/1     1            1           155d   alert-checker                           aathith/testing:alert-checker                               app=alert-checker
+kube-system            coredns                                 2/2     2            2           169d   coredns                                 k8s.gcr.io/coredns:1.6.5                                    k8s-app=kube-dns
+kubernetes-dashboard   dashboard-metrics-scraper               1/1     1            1           57d    dashboard-metrics-scraper               kubernetesui/metrics-scraper:v1.0.1                         k8s-app=dashboard-metrics-scraper
+kube-system            digitalocean-cloud-controller-manager   1/1     1            1           168d   digitalocean-cloud-controller-manager   digitalocean/digitalocean-cloud-controller-manager:v0.1.6   app=digitalocean-cloud-controller-manager
+kubernetes-dashboard   kubernetes-dashboard                    1/1     1            1           57d    kubernetes-dashboard                    kubernetesui/dashboard:v2.0.0-beta5                         k8s-app=kubernetes-dashboard
+kube-system            metrics-server                          1/1     1            1           151d   metrics-server                          k8s.gcr.io/metrics-server-amd64:v0.3.6                      k8s-app=metrics-server
+nginx-ingress          nginx-ingress                           1/1     1            1           57d    nginx-ingress                           nginx/nginx-ingress:1.6.3                                   app=nginx-ingress
+default                prom-trail                              1/1     1            1           113d   prom-trail                              aathith/testing:prometheus-url-annotation                   app=prom-trail
+default                prometheus                              1/1     1            1           115d   prometheus                              prom/prometheus                                             app=prometheus-server
+
+root@k8-master-01:~# kubesort deployment containers all
+NAMESPACE              NAME                                    READY   UP-TO-DATE   AVAILABLE   AGE    CONTAINERS                              IMAGES                                                      SELECTOR
+default                alert-checker                           1/1     1            1           155d   alert-checker                           aathith/testing:alert-checker                               app=alert-checker
+kube-system            coredns                                 2/2     2            2           169d   coredns                                 k8s.gcr.io/coredns:1.6.5                                    k8s-app=kube-dns
+kubernetes-dashboard   dashboard-metrics-scraper               1/1     1            1           57d    dashboard-metrics-scraper               kubernetesui/metrics-scraper:v1.0.1                         k8s-app=dashboard-metrics-scraper
+kube-system            digitalocean-cloud-controller-manager   1/1     1            1           168d   digitalocean-cloud-controller-manager   digitalocean/digitalocean-cloud-controller-manager:v0.1.6   app=digitalocean-cloud-controller-manager
+kubernetes-dashboard   kubernetes-dashboard                    1/1     1            1           57d    kubernetes-dashboard                    kubernetesui/dashboard:v2.0.0-beta5                         k8s-app=kubernetes-dashboard
+kube-system            metrics-server                          1/1     1            1           151d   metrics-server                          k8s.gcr.io/metrics-server-amd64:v0.3.6                      k8s-app=metrics-server
+nginx-ingress          nginx-ingress                           1/1     1            1           57d    nginx-ingress                           nginx/nginx-ingress:1.6.3                                   app=nginx-ingress
+default                prom-trail                              1/1     1            1           113d   prom-trail                              aathith/testing:prometheus-url-annotation                   app=prom-trail
+default                prometheus                              1/1     1            1           115d   prometheus                              prom/prometheus                                             app=prometheus-server
+
+root@k8-master-01:~# kubesort deployment age kube-system
+NAME                                    READY   UP-TO-DATE   AVAILABLE   AGE    CONTAINERS                              IMAGES                                                      SELECTOR
+coredns                                 2/2     2            2           169d   coredns                                 k8s.gcr.io/coredns:1.6.5                                    k8s-app=kube-dns
+digitalocean-cloud-controller-manager   1/1     1            1           168d   digitalocean-cloud-controller-manager   digitalocean/digitalocean-cloud-controller-manager:v0.1.6   app=digitalocean-cloud-controller-manager
+metrics-server                          1/1     1            1           151d   metrics-server                          k8s.gcr.io/metrics-server-amd64:v0.3.6                      k8s-app=metrics-server
+
+```
+</p>
+</details>
 
 ### v0.2.0 Limitations:
  You need Bash in your system.(will add more ways to install in future versions).
