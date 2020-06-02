@@ -42,6 +42,7 @@ AVAAIABLE OPTIONS:
 <details>
 <summary>Sorting Pod Samples:</summary>
 <br>
+```
 root@k8-master-01:~/kubesort# kubesort restarts kube-system
 NAME                                                     READY   STATUS    RESTARTS   AGE
 etcd-k8-master-01                                        1/1     Running   0          58d
@@ -83,7 +84,7 @@ NAME                         READY   STATUS    RESTARTS   AGE
 hello-app-5f9d7479bd-5mzmc   1/1     Running   0          2d6h
 hello-app-5f9d7479bd-db9s2   1/1     Running   0          2d6h
 hello-app-5f9d7479bd-kc4kr   1/1     Running   0          2d6h
-
+```
 </details>
 
 ### v0.2.0 Limitations:
