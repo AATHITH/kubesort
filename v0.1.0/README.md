@@ -1,10 +1,10 @@
 # Why you need `kubesort`:
 * `kubesort` helps you sort the results from `kubectl get` in an easy way.
-* You don't have to type `kubectl --sort-by=.status.containerStatuses[0].restartcount get po` to sort the pod by their STATUS, just type `kubesort status` that's it.
+* You don't have to type `kubectl --sort-by=.status.containerStatuses[0].restartcount get po` to sort the pod by their `RESTART` count, just type `kubesort restart` that's it.
 * `kubectl` has its own `--sort-by=json-path` feature for sorting but `kubesort` will make the sorting easier.
 ## Installation:
 Linux
-Since kubectx/kubens are written in Bash, you should be able to install them to any POSIX environment that has Bash installed.
+Since kubesort is written in Bash, you should be able to install them to any POSIX environment that has Bash installed.
 
 1) Download the kubesort scripts:<br>
    `sudo git clone https://github.com/aathith/kubesort /path/kubesort`
