@@ -39,9 +39,13 @@ AVAAIABLE OPTIONS:
 
                         option3: namespace-name or all
 ```
-<details>
-<summary>Sorting Pod Samples:</summary>
-<br>
+## Samples
+
+<details><summary>Sorting Pod:</summary>
+<p>
+
+
+
 ```
 root@k8-master-01:~/kubesort# kubesort restarts kube-system
 NAME                                                     READY   STATUS    RESTARTS   AGE
@@ -84,8 +88,10 @@ NAME                         READY   STATUS    RESTARTS   AGE
 hello-app-5f9d7479bd-5mzmc   1/1     Running   0          2d6h
 hello-app-5f9d7479bd-db9s2   1/1     Running   0          2d6h
 hello-app-5f9d7479bd-kc4kr   1/1     Running   0          2d6h
-
+```
+</p>
 </details>
+
 
 ### v0.2.0 Limitations:
  You need Bash in your system.(will add more ways to install in future versions).
