@@ -8,13 +8,14 @@
 #
 #
 
+  GNU nano 2.9.3                                                                                                                                                                                                                                                                                                       kubesort/kubesort                                                                                                                                                                                                                                                                                                                  
+
+#!/bin/bash
+
 cmd=$2
-option3=$3
-if [ "$#" -eq 2 ];
-then
-  option3=default
-  case "$1" in
-  pod|pods|po)
+option3=default
+[ -z "$cmd" ] && cmd="help";
+pod () {
      declare -A arg
      arg[name]=".metadata.name"
      arg[status]=".status.phase"
@@ -24,8 +25,8 @@ then
      arg[node]=".spec.nodeName"
      option1="pod"
      option2=${arg[$cmd]}
-  ;;
-  deploy|deployments|deployment)
+}
+deployment () {
      declare -A arg
      arg[name]=".metadata.name"
      arg[uptodate]=".status.updatedReplicas"
@@ -35,8 +36,8 @@ then
      arg[images]=".spec.template.spec.containers[*].image"
      option1="deployment"
      option2=${arg[$cmd]}
-  ;;
-  svc|service|services)
+}
+service () {
      declare -A arg
      arg[name]=".metadata.name"
      arg[type]=".spec.type"
@@ -45,7 +46,97 @@ then
      arg[age]=".metadata.creationTimestamp"
      option1="service"
      option2=${arg[$cmd]}
-  ;;
-  esac
+}
+namespace () {
+     declare -A arg
+     arg[name]=".metadata.name"
+     arg[status]=".status.phase"
+     arg[age]=".metadata.creationTimestamp"
+     option1="namespace"
+     option2=${arg[$cmd]}
+}
+node () {
+     declare -A arg
+     arg[name]=".metadata.name"
+     arg[status]=".status.phase"
+#     arg[role]=""
+     arg[age]=".metadata.creationTimestamp"
+     arg[version]=".status.nodeInfo.kubeletVersion"
+     arg[internalIP]=".status.addresses[?(@.type=="InternalIP")].address}"
+#     arg[externalIP]=""
+     arg[osimage]=".status.nodeInfo.osImage"
+     arg[kernelversion]=".status.nodeInfo.kernelVersion"
+     arg[cri]=".status.nodeInfo.containerRuntimeVersion"
+     option1="node"
+     option2=${arg[$cmd]}
+}
+help () {
+cat << EOF
+   Missing something? need Help?
+   Check this out.
 
-fi
+   kubesort option1 option2 option3
+   Available options are
+        option1:
+        (po/pod/pods), (deployments/deployment/deploy), (svc/service/services)
+
+                option2(po/pod/pods):
+                name, status, restarts, age, ip, node
+
+                option2(deployments/deployment/deploy):
+                name, uptodate, available, age, containers, images
+
+                option2(svc/service/services):
+                name, type, clusterIP, externalIP, ports, age
+
+                        option3: namespace-name or all
+EOF
+exit
+}
+
+
+case "$1" in
+  pod|pods|po)
+    pod
+  ;;
+  deploy|deployments|deployment)
+    deployment
+  ;;
+  svc|service|services)
+    service
+  ;;
+  namespaces|ns)
+    namespace
+  ;;
+  node|nodes)
+    node
+  ;;
+  *)
+    help
+  ;;
+esac
+
+case "$#" in
+     2)
+     option3=default
+     echo $option1 $option2 $option3 1
+     kubectl get $option1 --sort-by=$option2 -n $option3 -o wide
+     ;;
+
+     3)
+     if [ $3 = "all" ];
+     then
+        option3="--all-namespaces"
+        echo $option1 $option2 $option3 2
+        kubectl get $option1 --sort-by=$option2 $option3 -o wide
+     else
+        option3=$3
+        echo $option1 $option2 $option3 3
+        kubectl get $option1 --sort-by=$option2 -n $option3 -o wide
+     fi
+     ;;
+
+     *)
+     help
+     ;;
+esac
