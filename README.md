@@ -3,7 +3,7 @@
 This a Bash Script that will help you forget the kubectl's default, difficult to remember, sorting feature by making it simpler.<br>
 `kubectl` has its own `--sort-by=json-path` feature for sorting but **kubesort** will makes the sorting easier.
 
-## Why you need kubesort?
+## Why you need KUBESORT?
 
 1) It's simple
 2) Helps you sort the results from `kubectl` in an easy way.
