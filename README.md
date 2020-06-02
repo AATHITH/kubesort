@@ -24,7 +24,7 @@ Since kubesort is written in Bash, you should be able to install them to any POS
 ## Usage:
 ```
 SYNTAX: kubesort option1 option2 option3
-AVAAIABLE OPTIONS:
+AVAILABLE OPTIONS:
         option1:
         (po/pod/pods), (deployments/deployment/deploy), (svc/service/services)
 
