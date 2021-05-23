@@ -7,20 +7,18 @@ This a Bash Script that will help you forget the kubectl's default, difficult to
 
 1) It's simple
 2) Helps you sort the results from `kubectl` in an easy way.
-3) You don't have to type `kubectl --sort-by=.status.containerStatuses[0].restartcount get po` to sort the pod by their `RESTART` count, just type `kubesort po restarts` that's it.
+3) You don't have to type the long command `kubectl --sort-by=.status.containerStatuses[0].restartcount get po` to sort the pod by their `RESTART` count, just type `kubesort po restarts` that's it.
 
 
-## Installation:
+## 2 Step Installation:
 Linux
-Since kubesort is written in Bash, you should be able to install them to any POSIX environment that has Bash installed.
-
+Since kubesort is written in Bash, KUBESORT is exoected to run on any POSIX environment that has Bash installed.
 
 1) Download the kubesort scripts:<br>
-   `sudo git clone https://github.com/aathith/kubesort /path/kubesort`
+   `sudo git clone https://github.com/aathith/kubesort /usr/local/bin/kubesort`
 2) Make the script executable:<br>
-   `chmod +x /path/kubesort`
-3) Create symlinks to kubesort:<br>
-   `sudo ln -s /path/kubesort /usr/local/bin/kubesort`
+   `chmod +x /usr/local/bin/kubesort`
+
    
 ## Usage:
 ```
@@ -48,7 +46,7 @@ AVAILABLE OPTIONS:
 
 
 ```
-root@k8-master-01:~/kubesort# kubesort restarts kube-system
+root@k8-master-01:~/kubesort# kubesort po restarts kube-system
 NAME                                                     READY   STATUS    RESTARTS   AGE
 etcd-k8-master-01                                        1/1     Running   0          58d
 tiller-deploy-688ddc6c9-h6424                            1/1     Running   0          26d
@@ -65,12 +63,12 @@ kube-proxy-mlnrc                                         1/1     Running   13   
 kube-flannel-ds-amd64-lbxbr                              1/1     Running   14         93d
 filebeat-9hh95                                           1/1     Running   55         23d
 
-root@k8-master-01:~/kubesort# kubesort restart kubernetes-dashboard
+root@k8-master-01:~/kubesort# kubesort po restart kubernetes-dashboard
 NAME                                         READY   STATUS    RESTARTS   AGE
 dashboard-metrics-scraper-6c554969c6-8x2fc   1/1     Running   0          40d
 kubernetes-dashboard-56c5f95c6b-8c89b        1/1     Running   3          40d
 
-root@k8-master-01:~/kubesort# kubesort age all
+root@k8-master-01:~/kubesort# kubesort po age all
 NAMESPACE              NAME                                                     READY   STATUS    RESTARTS   AGE
 kube-system            kube-proxy-l592g                                         1/1     Running   7          93d
 kube-system            metricbeat-5rcb4                                         1/1     Running   13         88d
@@ -84,7 +82,7 @@ default                prometheus-784586f976-fq6q8                              
 dev                    hello-app-5f9d7479bd-kc4kr                               1/1     Running   0          2d6h
 olm                    catalog-operator-5bdf7fc7b-52qhw                         1/1     Running   0          5h21m
 
-root@k8-master-01:~/kubesort# kubesort name dev
+root@k8-master-01:~/kubesort# kubesort po name dev
 NAME                         READY   STATUS    RESTARTS   AGE
 hello-app-5f9d7479bd-5mzmc   1/1     Running   0          2d6h
 hello-app-5f9d7479bd-db9s2   1/1     Running   0          2d6h
@@ -170,19 +168,19 @@ kube-system            kubelet                     ClusterIP   None             
 </p>
 </details>
 
-### v0.2.0 Limitations:
+### v0.3.0 Limitations:
  You need Bash in your system.(will add more ways to install in future versions).
 
-### v0.2.0 Release notes:
-  You can now sort Deployment(6 options) and Service(5 options) resource in addition to the Pods(5 options).
-  Total of 3 resources and 16 options are now supported by KUBESORT.
-
+### v0.3.0 Release notes:
+  Typing to sort kubectl output is reduced furter with the addion of option to run KUBESORT with PIPE so that you don't have to remember seperate syntax for kubesort<br>
+  eg.:`kubesort get po age | kubesort` will get Pods sorted by their age.
 
 ### Roadmap:
 1) Sort for resource pv, pvc, replicasets, replication controllers, ingress resources, nodes, namespaces will be included.
 2) Bash auto-completion will be included.
 3) making this into Kubectl plugin.
 4) more install options.
+5) Video instruction on how to use KUBESORT.
 
 
 ### Tried and Tested in:
@@ -190,3 +188,14 @@ kube-system            kubelet                     ClusterIP   None             
    kubectl: v1.18.1<br>
    ubuntu: 18.04<br>
    bash: v4.4<br>
+
+
+## Contribution are welcomed here.
+#### What can you contribute?
+1) Reduce the no. of lines of the code.
+2) Add things to matchup with the Roadmap.
+#### Who can contribute?
+ANY ONE WITH INTEREST.
+
+
+## *** If KUBESORT interests you Do Give this Project a Star ***
