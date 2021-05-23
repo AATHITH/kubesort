@@ -1,17 +1,15 @@
 #!/bin/bash
 
 #
-#
-# Maintainer: AATHITH_RAJENDRAN
+# Creator and Maintainer: AATHITH_RAJENDRAN
 # Project: https://github.com/AATHITH/kubernetes/kubesort
-# version: 0.2.0
+# version: 0.3.0
 #
-#
-
 
 cmd=$2
-option3=default
+option3=$3
 [ -z "$cmd" ] && cmd="help";
+
 pod () {
      declare -A arg
      arg[name]=".metadata.name"
@@ -47,9 +45,8 @@ service () {
 help () {
 cat << EOF
    Missing something? need Help?
-   Check this out.
-
    kubesort option1 option2 option3
+
    Available options are
         option1:
         (po/pod/pods), (deployments/deployment/deploy), (svc/service/services)
@@ -68,32 +65,30 @@ EOF
 exit
 }
 
-
-case "$1" in
-  
+case "$1" in  
   pod|pods|po)
     pod
   ;;
-  
   deploy|deployments|deployment)
     deployment
   ;;
-  
   svc|service|services)
     service
   ;;
-
   *)
     help
   ;;
 esac
+
+if [ -p /dev/stdin ]; then
+    read -r cmd option3;
+fi
 
 case "$#" in
      2)
      option3=default
      kubectl get $option1 --sort-by=$option2 -n $option3 -o wide
      ;;
-
      3)
      if [ $3 = "all" ];
      then
@@ -104,7 +99,6 @@ case "$#" in
         kubectl get $option1 --sort-by=$option2 -n $option3 -o wide
      fi
      ;;
-
      *)
      help
      ;;
