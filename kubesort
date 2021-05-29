@@ -47,7 +47,7 @@ service () {
 help () {
 cat << EOF
    Missing something? need Help?
-   kubesort option1 option2 option3
+   kubesort kubectl get option1 option2 option3
 
    Available options are
         option1:
