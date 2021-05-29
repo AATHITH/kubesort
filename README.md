@@ -5,26 +5,24 @@ This a Bash Script that will help you forget the kubectl's default, difficult to
 
 ## Why you need KUBESORT?
 
-1) It's simple
-2) Helps you sort the results from `kubectl` in an easy way.
-3) You don't have to type `kubectl --sort-by=.status.containerStatuses[0].restartcount get po` to sort the pod by their `RESTART` count, just type `kubesort po restarts` that's it.
+1) It's simple and beginner-friendly.
+2) Helps you sort the results from `kubectl` easily.
+3) You don't have to type the long command `kubectl --sort-by=.status.containerStatuses[0].restartcount get po` to sort the pod by their `RESTART` count, just type `kubesort` in front of your `kubectl get` cmd like this `kubesort kubectl get po restart`, that's it.
 
 
-## Installation:
-Linux
-Since kubesort is written in Bash, you should be able to install them to any POSIX environment that has Bash installed.
-
+## 2 Step Installation:
+Linux:
+Since kubesort is written in Bash, KUBESORT is expected to run on any POSIX environment that has Bash installed.
 
 1) Download the kubesort scripts:<br>
-   `sudo git clone https://github.com/aathith/kubesort /path/kubesort`
+   `git clone https://github.com/aathith/kubesort /usr/local/bin/kubesort`
 2) Make the script executable:<br>
-   `chmod +x /path/kubesort`
-3) Create symlinks to kubesort:<br>
-   `sudo ln -s /path/kubesort /usr/local/bin/kubesort`
+   `chmod +x /usr/local/bin/kubesort`
+
    
 ## Usage:
 ```
-SYNTAX: kubesort option1 option2 option3
+SYNTAX: kubesort kubectl get option1 option2 option3
 AVAILABLE OPTIONS:
         option1:
         (po/pod/pods), (deployments/deployment/deploy), (svc/service/services)
@@ -48,7 +46,7 @@ AVAILABLE OPTIONS:
 
 
 ```
-root@k8-master-01:~/kubesort# kubesort restarts kube-system
+root@k8-master-01:~/kubesort# kubesort kubectl get po restarts kube-system
 NAME                                                     READY   STATUS    RESTARTS   AGE
 etcd-k8-master-01                                        1/1     Running   0          58d
 tiller-deploy-688ddc6c9-h6424                            1/1     Running   0          26d
@@ -65,12 +63,12 @@ kube-proxy-mlnrc                                         1/1     Running   13   
 kube-flannel-ds-amd64-lbxbr                              1/1     Running   14         93d
 filebeat-9hh95                                           1/1     Running   55         23d
 
-root@k8-master-01:~/kubesort# kubesort restart kubernetes-dashboard
+root@k8-master-01:~/kubesort# kubesort kubectl get po restart kubernetes-dashboard
 NAME                                         READY   STATUS    RESTARTS   AGE
 dashboard-metrics-scraper-6c554969c6-8x2fc   1/1     Running   0          40d
 kubernetes-dashboard-56c5f95c6b-8c89b        1/1     Running   3          40d
 
-root@k8-master-01:~/kubesort# kubesort age all
+root@k8-master-01:~/kubesort# kubesort kubectl get po age all
 NAMESPACE              NAME                                                     READY   STATUS    RESTARTS   AGE
 kube-system            kube-proxy-l592g                                         1/1     Running   7          93d
 kube-system            metricbeat-5rcb4                                         1/1     Running   13         88d
@@ -84,7 +82,7 @@ default                prometheus-784586f976-fq6q8                              
 dev                    hello-app-5f9d7479bd-kc4kr                               1/1     Running   0          2d6h
 olm                    catalog-operator-5bdf7fc7b-52qhw                         1/1     Running   0          5h21m
 
-root@k8-master-01:~/kubesort# kubesort name dev
+root@k8-master-01:~/kubesort# kubesort kubectl get po name dev
 NAME                         READY   STATUS    RESTARTS   AGE
 hello-app-5f9d7479bd-5mzmc   1/1     Running   0          2d6h
 hello-app-5f9d7479bd-db9s2   1/1     Running   0          2d6h
@@ -96,13 +94,13 @@ hello-app-5f9d7479bd-kc4kr   1/1     Running   0          2d6h
 <p>
 
 ```
-root@k8-master-01:~# kubesort deployment name
+root@k8-master-01:~# kubesort kubectl get deployment name
 NAME              READY   UP-TO-DATE   AVAILABLE   AGE    CONTAINERS        IMAGES                                      SELECTOR
 alert-checker     1/1     1            1           155d   alert-checker     aathith/testing:alert-checker               app=alert-checker
 prom-trail        1/1     1            1           113d   prom-trail        aathith/testing:prometheus-url-annotation   app=prom-trail
 prometheus        1/1     1            1           115d   prometheus        prom/prometheus                             app=prometheus-server
 
-root@k8-master-01:~# kubesort deployment name all
+root@k8-master-01:~# kubesort kubectl get deployment name all
 NAMESPACE              NAME                                    READY   UP-TO-DATE   AVAILABLE   AGE    CONTAINERS                              IMAGES                                                      SELECTOR
 default                alert-checker                           1/1     1            1           155d   alert-checker                           aathith/testing:alert-checker                               app=alert-checker
 kube-system            coredns                                 2/2     2            2           169d   coredns                                 k8s.gcr.io/coredns:1.6.5                                    k8s-app=kube-dns
@@ -114,7 +112,7 @@ nginx-ingress          nginx-ingress                           1/1     1        
 default                prom-trail                              1/1     1            1           113d   prom-trail                              aathith/testing:prometheus-url-annotation                   app=prom-trail
 default                prometheus                              1/1     1            1           115d   prometheus                              prom/prometheus                                             app=prometheus-server
 
-root@k8-master-01:~# kubesort deployment containers all
+root@k8-master-01:~# kubesort kubectl get deployment containers all
 NAMESPACE              NAME                                    READY   UP-TO-DATE   AVAILABLE   AGE    CONTAINERS                              IMAGES                                                      SELECTOR
 default                alert-checker                           1/1     1            1           155d   alert-checker                           aathith/testing:alert-checker                               app=alert-checker
 kube-system            coredns                                 2/2     2            2           169d   coredns                                 k8s.gcr.io/coredns:1.6.5                                    k8s-app=kube-dns
@@ -126,7 +124,7 @@ nginx-ingress          nginx-ingress                           1/1     1        
 default                prom-trail                              1/1     1            1           113d   prom-trail                              aathith/testing:prometheus-url-annotation                   app=prom-trail
 default                prometheus                              1/1     1            1           115d   prometheus                              prom/prometheus                                             app=prometheus-server
 
-root@k8-master-01:~# kubesort deployment age kube-system
+root@k8-master-01:~# kubesort kubectl get deployment age kube-system
 NAME                                    READY   UP-TO-DATE   AVAILABLE   AGE    CONTAINERS                              IMAGES                                                      SELECTOR
 coredns                                 2/2     2            2           169d   coredns                                 k8s.gcr.io/coredns:1.6.5                                    k8s-app=kube-dns
 digitalocean-cloud-controller-manager   1/1     1            1           168d   digitalocean-cloud-controller-manager   digitalocean/digitalocean-cloud-controller-manager:v0.1.6   app=digitalocean-cloud-controller-manager
@@ -139,21 +137,21 @@ metrics-server                          1/1     1            1           151d   
 <p>
 
 ```
-root@k8-master-01:~# kubesort svc type
+root@k8-master-01:~# kubesort kubectl get svc type
 NAME              TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                         AGE    SELECTOR
 kubernetes        ClusterIP   10.96.0.1        <none>        443/TCP                         169d   <none>
 alert-checker     NodePort    10.110.87.73     <none>        8080:31080/TCP                  155d   app=alert-checker
 prom-trail        NodePort    10.97.208.221    <none>        8080:32445/TCP,1234:32446/TCP   115d   app=prom-trail
 prometheus        NodePort    10.98.222.241    <none>        9090:31976/TCP                  117d   app=prometheus-server
 
-root@k8-master-01:~# kubesort svc age kube-system
+root@k8-master-01:~# kubesort kubectl gett svc age kube-system
 NAME             TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                  AGE    SELECTOR
 kube-dns         ClusterIP   10.96.0.10       <none>        53/UDP,53/TCP,9153/TCP   169d   k8s-app=kube-dns
 tiller-deploy    ClusterIP   10.108.104.169   <none>        44134/TCP                165d   app=helm,name=tiller
 metrics-server   ClusterIP   10.98.220.21     <none>        443/TCP                  162d   k8s-app=metrics-server
 kubelet          ClusterIP   None             <none>        10250/TCP                117d   <none>
    
-root@k8-master-01:~# kubesort svc clusterip all
+root@k8-master-01:~# kubesort kubectl get svc clusterip all
 NAMESPACE              NAME                        TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                         AGE    SELECTOR  
 default                kubernetes                  ClusterIP   10.96.0.1        <none>        443/TCP                         169d   <none>
 kube-system            kube-dns                    ClusterIP   10.96.0.10       <none>        53/UDP,53/TCP,9153/TCP          169d   k8s-app=kube-dns
@@ -170,23 +168,32 @@ kube-system            kubelet                     ClusterIP   None             
 </p>
 </details>
 
-### v0.2.0 Limitations:
- You need Bash in your system.(will add more ways to install in future versions).
+### v0.3.0 Limitations:
+ You need Bash in your system. (will add more ways to install in future versions).
 
-### v0.2.0 Release notes:
-  You can now sort Deployment(6 options) and Service(5 options) resource in addition to the Pods(5 options).
-  Total of 3 resources and 16 options are now supported by KUBESORT.
-
+### v0.3.0 Release notes:
+  1. Typing to get the sorted output from kubectl is further reduced.
+  2. You don't have to remember the separate syntax for KUBESORT. Add `kubectl` keyword in front of `kubectl get` command.<br>
+  eg.:`kubesort kubectl get pod age` will get Pods sorted by their age.
 
 ### Roadmap:
-1) Sort for resource pv, pvc, replicasets, replication controllers, ingress resources, nodes, namespaces will be included.
-2) Bash auto-completion will be included.
-3) making this into Kubectl plugin.
-4) more install options.
+- [ ] Sort for resource pv, pvc, replicasets, replication controllers, ingress resources, nodes, namespaces will be included.
+- [ ] More options to install KUBESORT.
+- [ ] Video instruction on how to use KUBESORT.
 
 
 ### Tried and Tested in:
    k8s: v1.18.1<br>
    kubectl: v1.18.1<br>
-   ubuntu: 18.04<br>
-   bash: v4.4<br>
+   bash: v4.4.20<br>
+
+
+## Contributions are welcomed here.
+#### What can you contribute?
+1) Reduce the no. of lines of the code or simplify the code.
+2) Add things to match up with the Roadmap.
+#### Who can contribute?
+ANYONE WITH INTEREST.
+
+
+## *** If KUBESORT interests you, Do Give this Project a Star ***

@@ -1,17 +1,17 @@
 #!/bin/bash
 
 #
-#
-# Maintainer: AATHITH_RAJENDRAN
+# Creator and Maintainer: AATHITH_RAJENDRAN
 # Project: https://github.com/AATHITH/kubernetes/kubesort
-# version: 0.2.0
+# version: 0.3.0
 #
-#
+#uncomment next line for debugging
+# set -x
 
-
-cmd=$2
-option3=default
+cmd=$4
+option3=$4
 [ -z "$cmd" ] && cmd="help";
+
 pod () {
      declare -A arg
      arg[name]=".metadata.name"
@@ -47,9 +47,8 @@ service () {
 help () {
 cat << EOF
    Missing something? need Help?
-   Check this out.
+   kubesort kubectl get option1 option2 option3
 
-   kubesort option1 option2 option3
    Available options are
         option1:
         (po/pod/pods), (deployments/deployment/deploy), (svc/service/services)
@@ -68,44 +67,42 @@ EOF
 exit
 }
 
+if [[ "$1" = "kubectl" && "$2" = "get" ]];
+then
+  case "$3" in
+    pod|pods|po)
+      pod
+    ;;
+    deploy|deployments|deployment)
+      deployment
+    ;;
+    svc|service|services)
+      service
+    ;;
+    *)
+      help
+    ;;
+  esac
 
-case "$1" in
-  
-  pod|pods|po)
-    pod
-  ;;
-  
-  deploy|deployments|deployment)
-    deployment
-  ;;
-  
-  svc|service|services)
-    service
-  ;;
-
-  *)
-    help
-  ;;
-esac
-
-case "$#" in
-     2)
+  case "$#" in
+     4)
      option3=default
      kubectl get $option1 --sort-by=$option2 -n $option3 -o wide
      ;;
-
-     3)
-     if [ $3 = "all" ];
+     5)
+     if [ $5 = "all" ];
      then
         option3="--all-namespaces"
         kubectl get $option1 --sort-by=$option2 $option3 -o wide
      else
-        option3=$3
+        option3=$5
         kubectl get $option1 --sort-by=$option2 -n $option3 -o wide
      fi
      ;;
-
      *)
      help
      ;;
-esac
+  esac
+else
+  help
+fi
