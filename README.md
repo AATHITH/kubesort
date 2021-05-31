@@ -168,13 +168,6 @@ kube-system            kubelet                     ClusterIP   None             
 </p>
 </details>
 
-### v0.3.0 Limitations:
- You need Bash in your system. (will add more ways to install in future versions).
-
-### v0.3.0 Release notes:
-  1. Typing to get the sorted output from kubectl is further reduced.
-  2. You don't have to remember the separate syntax for KUBESORT. Add `kubectl` keyword in front of `kubectl get` command.<br>
-  eg.:`kubesort kubectl get pod age` will get Pods sorted by their age.
 
 ### Roadmap:
 - [ ] Sort for resource pv, pvc, replicasets, replication controllers, ingress resources, nodes, namespaces will be included.
@@ -194,6 +187,9 @@ kube-system            kubelet                     ClusterIP   None             
 2) Add things to match up with the Roadmap.
 #### Who can contribute?
 ANYONE WITH INTEREST.
+
+
+**[Release notes](https://github.com/AATHITH/kubesort/releases/tag/v0.3.0)**
 
 
 ## *** If KUBESORT interests you, Do Give this Project a Star ***
