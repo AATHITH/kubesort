@@ -8,6 +8,33 @@
 #uncomment next line for debugging
 # set -x
 
+# detect if the script is being piped to
+if [[ -p /dev/stdin ]]; then
+    # save the data from the pipe
+    PIPED_DATA=$(cat -)
+    SORT_ARG=$1
+fi
+
+# Use this function to sort piped data
+sort_pipe () {
+
+  # save our header information for later
+  # this script wouldn't work if --no-headers is used
+  HEADER=$(echo "$PIPED_DATA" | head -1)
+  # use the first arg or age by default
+  SORT_FIELD=${SORT_ARG:-AGE}
+
+  # find which column number our sort field is in.
+  # this should return a column number.
+  # grep is case insensitive
+  COLUMN=$(echo "$HEADER" | tr -s ' ' '\n' | nl | grep -i ${SORT_FIELD} | awk '{print $1}')
+
+  # echo header separate so `sort` doesn't try to move it
+  echo "$HEADER"
+  # echo the rest of our data. sorted and without header row
+  echo "$PIPED_DATA" |tail -n +2| sort -h -r -k $COLUMN
+}
+
 cmd=$4
 option3=$4
 [ -z "$cmd" ] && cmd="help";
@@ -66,6 +93,12 @@ cat << EOF
 EOF
 exit
 }
+
+# check for piped data. run our function if it's set
+if [ -n "${PIPED_DATA}" ]; then
+  sort_pipe
+  exit
+fi
 
 if [[ "$1" = "kubectl" && "$2" = "get" ]];
 then
