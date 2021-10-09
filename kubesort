@@ -44,6 +44,28 @@ service () {
      option1="service"
      option2=${arg[$cmd]}
 }
+replicaset () {
+     declare -A arg
+     arg[name]=".metadata.name"
+     arg[namespace]=".metadata.namespace"
+     arg[desired]=".spec.replicas"
+     arg[ready]=".status.readyReplicas"
+     arg[available]=".status.availableReplicas"
+     arg[age]="metadata.creationTimestamp"
+     option1="replicaset"
+     option2=${arg[$cmd]}
+}
+replicationcontroller() {
+     declare -A arg
+     arg[name]=".metadata.name"
+     arg[namespace]=".metadata.namespace"
+     arg[desired]=".spec.replicas"
+     arg[ready]=".status.readyReplicas"
+     arg[available]=".status.availableReplicas"
+     arg[age]="metadata.creationTimestamp"
+     option1="replicationcontroller"
+     option2=${arg[$cmd]}
+}
 help () {
 cat << EOF
    Missing something? need Help?
@@ -51,7 +73,7 @@ cat << EOF
 
    Available options are
         option1:
-        (po/pod/pods), (deployments/deployment/deploy), (svc/service/services)
+        (po/pod/pods), (deployments/deployment/deploy), (svc/service/services), (rs/replicaset), (rc/replicationcontroller)
 
                 option2(po/pod/pods):
                 name, status, restarts, age, ip, node
@@ -62,6 +84,8 @@ cat << EOF
                 option2(svc/service/services):
                 name, type, clusterIP, externalIP, ports, age
 
+                option3(rs/replicaset):
+                namespace, name, desired, ready, available, age
                         option3: namespace-name or all
 EOF
 exit
@@ -78,6 +102,12 @@ then
     ;;
     svc|service|services)
       service
+    ;;
+    rs|replicaset)
+      replicaset
+    ;;
+    rc|replicationcontroller)
+      replicationcontroller
     ;;
     *)
       help
