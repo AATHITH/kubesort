@@ -3,7 +3,7 @@
 #
 # Creator and Maintainer: AATHITH_RAJENDRAN
 # Project: https://github.com/AATHITH/kubernetes/kubesort
-# version: 0.3.0
+# version: 0.4.0
 #
 #uncomment next line for debugging
 # set -x
@@ -66,6 +66,47 @@ replicationcontroller() {
      option1="replicationcontroller"
      option2=${arg[$cmd]}
 }
+persistentvolume() {
+     declare -A arg
+     arg[name]=".metadata.name"
+     arg[capacity]=".spec.capacity.storage"
+     arg[accessmodes]=".spec.accessModes[*]"
+     arg[reclaimpolicy]=".spec.persistentVolumeReclaimPolicy"
+     arg[status]=".status.phase"
+     arg[storageclass]=".spec.storageClassName"
+     arg[reason]=".reason"
+     arg[age]="metadata.creationTimestamp"
+     option1="persistentvolume"
+     option2=${arg[$cmd]}
+}
+persistentvolumeclaim() {
+     declare -A arg
+     arg[name]=".metadata.name"
+     arg[namespace]=".metadata.namespace"
+     arg[status]=".status.phase"
+     arg[volume]=".spec.volumeName"
+     arg[capacity]=".status.capacity.storage"
+     arg[accessmodes]=".spec.accessModes[*]"
+     arg[storageclass]=".spec.storageClassName"
+     arg[age]="metadata.creationTimestamp"
+     arg[volumemode]=".spec.volumeMode"
+     option1="persistentvolumeclaim"
+     option2=${arg[$cmd]}
+}
+node () {
+     declare -A arg
+     arg[name]=".metadata.name"
+     arg[age]="metadata.creationTimestamp"
+     arg[status]=""
+     arg[version]=".status.nodeInfo.kubeletVersion"
+     arg[internal-ip]=""
+     arg[external-ip]=""
+     arg[os-image]=".status.nodeInfo.osImage"
+     arg[kernel-version]=".status.nodeInfo.kernelVersion"
+     arg[container-runtime]=".status.nodeInfo.containerRuntimeVersion"
+     option1="node"
+     option2=${arg[$cmd]}
+}
 help () {
 cat << EOF
    Missing something? need Help?
@@ -73,20 +114,33 @@ cat << EOF
 
    Available options are
         option1:
-        (po/pod/pods), (deployments/deployment/deploy), (svc/service/services), (rs/replicaset), (rc/replicationcontroller)
+        (po|pod|pods), (deployments|deployment|deploy), (svc|service|services), (rs|replicaset), (rc|replicationcontroller), (pv|persistentvolume), (pvc|persistentvolumeclaim), (no|node|nodes)
 
-                option2(po/pod/pods):
+                option2 for (po|pod|pods):
                 name, status, restarts, age, ip, node
 
-                option2(deployments/deployment/deploy):
+                option2 for (deployments|deployment|deploy):
                 name, uptodate, available, age, containers, images
 
-                option2(svc/service/services):
+                option2 for (svc|service|services):
                 name, type, clusterIP, externalIP, ports, age
 
-                option3(rs/replicaset):
+                option2 for (rs|replicaset):
                 namespace, name, desired, ready, available, age
-                        option3: namespace-name or all
+                
+                option2 for (rc|replicationcontroller|replicationcontroller):
+                name, namespace, desired, ready, available, age
+                
+                option2 for (pv|persistentvolume|persistentvolumes):
+                name, capacity, accessmodes, reclaimpolicy, status, claim, storageclass, reason, age, volumemode
+                
+                option2 for (pvc|persistentvolumeclaim|persistentvolumeclaims):
+                name, status, volume, capacity, accessmodes, storageclass, age, volumemode
+                
+                option2 for (no|node|nodes):
+                name, status, age, version, internal-ip, external-ip, os-image, kernel-version, container-runtime
+                
+                        option3: 'name of the namespace' or 'all'
 EOF
 exit
 }
@@ -106,8 +160,17 @@ then
     rs|replicaset)
       replicaset
     ;;
-    rc|replicationcontroller)
-      replicationcontroller
+    rc|replicationcontroller|replicationcontrollers)
+      replicationController
+    ;;
+    pv|persistentvolume|persistentvolumes)
+       persistentvolume
+    ;;
+    pvc|persistentvolumeclaim|persistentvolumeclaims)
+       persistentvolumeclaim
+    ;;
+    no|node|nodes)
+      node
     ;;
     *)
       help
