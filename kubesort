@@ -2,200 +2,354 @@
 
 #
 # Creator and Maintainer: AATHITH_RAJENDRAN
-# Project: https://github.com/AATHITH/kubesort
-# version: 0.4.0
+# Project: https://github.com/AATHITH/kubernetes/kubesort
+# version: 1.0.0 - Dynamic Kubernetes Resource Sorter
+#
+# Enhanced version with support for many more Kubernetes resources
+# and dynamic field discovery based on kubectl output columns
 #
 #uncomment next line for debugging
 # set -x
 
-cmd=$4
-option3=$4
-[ -z "$cmd" ] && cmd="help";
+# Global variables
+declare -A RESOURCE_MAP
+declare -A SORT_FIELDS
+declare resource_type=""
+declare sort_field=""
+declare namespace_option=""
 
-pod () {
-     declare -A arg
-     arg[name]=".metadata.name"
-     arg[status]=".status.phase"
-     arg[restarts]=".status.containerStatuses[0].restartCount"
-     arg[age]=".status.startTime"
-     arg[ip]=".status.podIP"
-     arg[node]=".spec.nodeName"
-     option1="pod"
-     option2=${arg[$cmd]}
+# Initialize all supported Kubernetes resources and their sortable fields
+init_resources() {
+    # Pods
+    RESOURCE_MAP["pod"]="pod"
+    RESOURCE_MAP["pods"]="pod"
+    RESOURCE_MAP["po"]="pod"
+    SORT_FIELDS["pod,name"]=".metadata.name"
+    SORT_FIELDS["pod,status"]=".status.phase"
+    SORT_FIELDS["pod,restarts"]=".status.containerStatuses[0].restartCount"
+    SORT_FIELDS["pod,age"]=".metadata.creationTimestamp"
+    SORT_FIELDS["pod,ip"]=".status.podIP"
+    SORT_FIELDS["pod,node"]=".spec.nodeName"
+    SORT_FIELDS["pod,ready"]=".status.conditions[?(@.type==\"Ready\")].status"
+
+    # Deployments
+    RESOURCE_MAP["deployment"]="deployment"
+    RESOURCE_MAP["deployments"]="deployment"
+    RESOURCE_MAP["deploy"]="deployment"
+    SORT_FIELDS["deployment,name"]=".metadata.name"
+    SORT_FIELDS["deployment,ready"]=".status.readyReplicas"
+    SORT_FIELDS["deployment,uptodate"]=".status.updatedReplicas"
+    SORT_FIELDS["deployment,available"]=".status.availableReplicas"
+    SORT_FIELDS["deployment,age"]=".metadata.creationTimestamp"
+    SORT_FIELDS["deployment,containers"]=".spec.template.spec.containers[*].name"
+    SORT_FIELDS["deployment,images"]=".spec.template.spec.containers[*].image"
+
+    # Services
+    RESOURCE_MAP["service"]="service"
+    RESOURCE_MAP["services"]="service"
+    RESOURCE_MAP["svc"]="service"
+    SORT_FIELDS["service,name"]=".metadata.name"
+    SORT_FIELDS["service,type"]=".spec.type"
+    SORT_FIELDS["service,clusterip"]=".spec.clusterIP"
+    SORT_FIELDS["service,externalip"]=".status.loadBalancer.ingress[0].ip"
+    SORT_FIELDS["service,port"]=".spec.ports[0].port"
+    SORT_FIELDS["service,age"]=".metadata.creationTimestamp"
+
+    # Nodes
+    RESOURCE_MAP["node"]="node"
+    RESOURCE_MAP["nodes"]="node"
+    SORT_FIELDS["node,name"]=".metadata.name"
+    SORT_FIELDS["node,status"]=".status.conditions[?(@.type==\"Ready\")].status"
+    SORT_FIELDS["node,roles"]=".metadata.labels[\"kubernetes.io/role\"]"
+    SORT_FIELDS["node,age"]=".metadata.creationTimestamp"
+    SORT_FIELDS["node,version"]=".status.nodeInfo.kubeletVersion"
+    SORT_FIELDS["node,internal-ip"]=".status.addresses[?(@.type==\"InternalIP\")].address"
+    SORT_FIELDS["node,external-ip"]=".status.addresses[?(@.type==\"ExternalIP\")].address"
+
+    # PersistentVolumes
+    RESOURCE_MAP["persistentvolume"]="pv"
+    RESOURCE_MAP["persistentvolumes"]="pv"
+    RESOURCE_MAP["pv"]="pv"
+    SORT_FIELDS["pv,name"]=".metadata.name"
+    SORT_FIELDS["pv,capacity"]=".spec.capacity.storage"
+    SORT_FIELDS["pv,accessmodes"]=".spec.accessModes[0]"
+    SORT_FIELDS["pv,reclaimpolicy"]=".spec.persistentVolumeReclaimPolicy"
+    SORT_FIELDS["pv,status"]=".status.phase"
+    SORT_FIELDS["pv,claim"]=".spec.claimRef.name"
+    SORT_FIELDS["pv,storageclass"]=".spec.storageClassName"
+    SORT_FIELDS["pv,reason"]=".status.reason"
+    SORT_FIELDS["pv,age"]=".metadata.creationTimestamp"
+
+    # PersistentVolumeClaims
+    RESOURCE_MAP["persistentvolumeclaim"]="pvc"
+    RESOURCE_MAP["persistentvolumeclaims"]="pvc"
+    RESOURCE_MAP["pvc"]="pvc"
+    SORT_FIELDS["pvc,name"]=".metadata.name"
+    SORT_FIELDS["pvc,status"]=".status.phase"
+    SORT_FIELDS["pvc,volume"]=".spec.volumeName"
+    SORT_FIELDS["pvc,capacity"]=".status.capacity.storage"
+    SORT_FIELDS["pvc,accessmodes"]=".status.accessModes[0]"
+    SORT_FIELDS["pvc,storageclass"]=".spec.storageClassName"
+    SORT_FIELDS["pvc,age"]=".metadata.creationTimestamp"
+
+    # ReplicaSets
+    RESOURCE_MAP["replicaset"]="replicaset"
+    RESOURCE_MAP["replicasets"]="replicaset"
+    RESOURCE_MAP["rs"]="replicaset"
+    SORT_FIELDS["replicaset,name"]=".metadata.name"
+    SORT_FIELDS["replicaset,desired"]=".spec.replicas"
+    SORT_FIELDS["replicaset,current"]=".status.replicas"
+    SORT_FIELDS["replicaset,ready"]=".status.readyReplicas"
+    SORT_FIELDS["replicaset,age"]=".metadata.creationTimestamp"
+
+    # ReplicationControllers
+    RESOURCE_MAP["replicationcontroller"]="rc"
+    RESOURCE_MAP["replicationcontrollers"]="rc"
+    RESOURCE_MAP["rc"]="rc"
+    SORT_FIELDS["rc,name"]=".metadata.name"
+    SORT_FIELDS["rc,desired"]=".spec.replicas"
+    SORT_FIELDS["rc,current"]=".status.replicas"
+    SORT_FIELDS["rc,ready"]=".status.readyReplicas"
+    SORT_FIELDS["rc,age"]=".metadata.creationTimestamp"
+
+    # DaemonSets
+    RESOURCE_MAP["daemonset"]="daemonset"
+    RESOURCE_MAP["daemonsets"]="daemonset"
+    RESOURCE_MAP["ds"]="daemonset"
+    SORT_FIELDS["daemonset,name"]=".metadata.name"
+    SORT_FIELDS["daemonset,desired"]=".status.desiredNumberScheduled"
+    SORT_FIELDS["daemonset,current"]=".status.currentNumberScheduled"
+    SORT_FIELDS["daemonset,ready"]=".status.numberReady"
+    SORT_FIELDS["daemonset,uptodate"]=".status.updatedNumberScheduled"
+    SORT_FIELDS["daemonset,available"]=".status.numberAvailable"
+    SORT_FIELDS["daemonset,age"]=".metadata.creationTimestamp"
+
+    # StatefulSets
+    RESOURCE_MAP["statefulset"]="statefulset"
+    RESOURCE_MAP["statefulsets"]="statefulset"
+    RESOURCE_MAP["sts"]="statefulset"
+    SORT_FIELDS["statefulset,name"]=".metadata.name"
+    SORT_FIELDS["statefulset,ready"]=".status.readyReplicas"
+    SORT_FIELDS["statefulset,age"]=".metadata.creationTimestamp"
+
+    # ConfigMaps
+    RESOURCE_MAP["configmap"]="configmap"
+    RESOURCE_MAP["configmaps"]="configmap"
+    RESOURCE_MAP["cm"]="configmap"
+    SORT_FIELDS["configmap,name"]=".metadata.name"
+    SORT_FIELDS["configmap,data"]=".data | length"
+    SORT_FIELDS["configmap,age"]=".metadata.creationTimestamp"
+
+    # Secrets
+    RESOURCE_MAP["secret"]="secret"
+    RESOURCE_MAP["secrets"]="secret"
+    SORT_FIELDS["secret,name"]=".metadata.name"
+    SORT_FIELDS["secret,type"]=".type"
+    SORT_FIELDS["secret,data"]=".data | length"
+    SORT_FIELDS["secret,age"]=".metadata.creationTimestamp"
+
+    # Ingress
+    RESOURCE_MAP["ingress"]="ingress"
+    RESOURCE_MAP["ingresses"]="ingress"
+    RESOURCE_MAP["ing"]="ingress"
+    SORT_FIELDS["ingress,name"]=".metadata.name"
+    SORT_FIELDS["ingress,class"]=".spec.ingressClassName"
+    SORT_FIELDS["ingress,hosts"]=".spec.rules[*].host"
+    SORT_FIELDS["ingress,address"]=".status.loadBalancer.ingress[0].ip"
+    SORT_FIELDS["ingress,ports"]=".spec.rules[*].http.paths[*].backend.service.port.number"
+    SORT_FIELDS["ingress,age"]=".metadata.creationTimestamp"
+
+    # Namespaces
+    RESOURCE_MAP["namespace"]="namespace"
+    RESOURCE_MAP["namespaces"]="namespace"
+    RESOURCE_MAP["ns"]="namespace"
+    SORT_FIELDS["namespace,name"]=".metadata.name"
+    SORT_FIELDS["namespace,status"]=".status.phase"
+    SORT_FIELDS["namespace,age"]=".metadata.creationTimestamp"
 }
-deployment () {
-     declare -A arg
-     arg[name]=".metadata.name"
-     arg[uptodate]=".status.updatedReplicas"
-     arg[available]=".metadata.availableReplicas"
-     arg[age]=".metadata.creationTimestamp"
-     arg[containers]=".spec.template.spec.containers[*].name"
-     arg[images]=".spec.template.spec.containers[*].image"
-     option1="deployment"
-     option2=${arg[$cmd]}
+
+# Get available sort fields for a resource type
+get_sort_fields() {
+    local resource=$1
+    local fields=()
+    
+    for key in "${!SORT_FIELDS[@]}"; do
+        if [[ $key == "$resource,"* ]]; then
+            field_name=${key#*,}
+            fields+=("$field_name")
+        fi
+    done
+    
+    printf "%s\n" "${fields[@]}" | sort
 }
-service () {
-     declare -A arg
-     arg[name]=".metadata.name"
-     arg[type]=".spec.type"
-     arg[clusterip]=".spec.clusterIP"
-     arg[port]=".spec.ports[*].port"
-     arg[age]=".metadata.creationTimestamp"
-     option1="service"
-     option2=${arg[$cmd]}
+
+# Get all supported resource types
+get_resource_types() {
+    local types=()
+    for key in "${!RESOURCE_MAP[@]}"; do
+        types+=("$key")
+    done
+    printf "%s\n" "${types[@]}" | sort -u
 }
-replicaset () {
-     declare -A arg
-     arg[name]=".metadata.name"
-     arg[namespace]=".metadata.namespace"
-     arg[desired]=".spec.replicas"
-     arg[ready]=".status.readyReplicas"
-     arg[available]=".status.availableReplicas"
-     arg[age]="metadata.creationTimestamp"
-     option1="replicaset"
-     option2=${arg[$cmd]}
-}
-replicationcontroller() {
-     declare -A arg
-     arg[name]=".metadata.name"
-     arg[namespace]=".metadata.namespace"
-     arg[desired]=".spec.replicas"
-     arg[ready]=".status.readyReplicas"
-     arg[available]=".status.availableReplicas"
-     arg[age]="metadata.creationTimestamp"
-     option1="replicationcontroller"
-     option2=${arg[$cmd]}
-}
-persistentvolume() {
-     declare -A arg
-     arg[name]=".metadata.name"
-     arg[capacity]=".spec.capacity.storage"
-     arg[accessmodes]=".spec.accessModes[*]"
-     arg[reclaimpolicy]=".spec.persistentVolumeReclaimPolicy"
-     arg[status]=".status.phase"
-     arg[storageclass]=".spec.storageClassName"
-     arg[reason]=".reason"
-     arg[age]="metadata.creationTimestamp"
-     option1="persistentvolume"
-     option2=${arg[$cmd]}
-}
-persistentvolumeclaim() {
-     declare -A arg
-     arg[name]=".metadata.name"
-     arg[namespace]=".metadata.namespace"
-     arg[status]=".status.phase"
-     arg[volume]=".spec.volumeName"
-     arg[capacity]=".status.capacity.storage"
-     arg[accessmodes]=".spec.accessModes[*]"
-     arg[storageclass]=".spec.storageClassName"
-     arg[age]="metadata.creationTimestamp"
-     arg[volumemode]=".spec.volumeMode"
-     option1="persistentvolumeclaim"
-     option2=${arg[$cmd]}
-}
-node () {
-     declare -A arg
-     arg[name]=".metadata.name"
-     arg[age]="metadata.creationTimestamp"
-     arg[status]=""
-     arg[version]=".status.nodeInfo.kubeletVersion"
-     arg[internal-ip]=""
-     arg[external-ip]=""
-     arg[os-image]=".status.nodeInfo.osImage"
-     arg[kernel-version]=".status.nodeInfo.kernelVersion"
-     arg[container-runtime]=".status.nodeInfo.containerRuntimeVersion"
-     option1="node"
-     option2=${arg[$cmd]}
-}
-help () {
+
+# Generate dynamic help
+help() {
 cat << EOF
-   Missing something? need Help?
-   kubesort kubectl get option1 option2 option3
+🔍 KubeSort - Dynamic Kubernetes Resource Sorter v1.0.0
 
-   Available options are
-        option1:
-        (po|pod|pods), (deployments|deployment|deploy), (svc|service|services), (rs|replicaset), (rc|replicationcontroller), (pv|persistentvolume), (pvc|persistentvolumeclaim), (no|node|nodes)
+Usage:
+    kubesort kubectl get <resource_type> <sort_field> [-n namespace|-A|--all-namespaces]
 
-                option2 for (po|pod|pods):
-                name, status, restarts, age, ip, node
+Examples:
+    kubesort kubectl get pods name                     # Sort pods by name in default namespace
+    kubesort kubectl get deployments age -A           # Sort deployments by age across all namespaces  
+    kubesort kubectl get nodes status                  # Sort nodes by status
+    kubesort kubectl get pvc capacity -n kube-system  # Sort PVCs by capacity in kube-system namespace
+    kubesort kubectl get services port -n default     # Sort services by port in default namespace
 
-                option2 for (deployments|deployment|deploy):
-                name, uptodate, available, age, containers, images
-
-                option2 for (svc|service|services):
-                name, type, clusterIP, externalIP, ports, age
-
-                option2 for (rs|replicaset):
-                namespace, name, desired, ready, available, age
-                
-                option2 for (rc|replicationcontroller|replicationcontroller):
-                name, namespace, desired, ready, available, age
-                
-                option2 for (pv|persistentvolume|persistentvolumes):
-                name, capacity, accessmodes, reclaimpolicy, status, claim, storageclass, reason, age, volumemode
-                
-                option2 for (pvc|persistentvolumeclaim|persistentvolumeclaims):
-                name, status, volume, capacity, accessmodes, storageclass, age, volumemode
-                
-                option2 for (no|node|nodes):
-                name, status, age, version, internal-ip, external-ip, os-image, kernel-version, container-runtime
-                
-                        option3: 'name of the namespace' or 'all'
+📋 Supported Resources:
 EOF
-exit
+
+    echo
+    # Get unique canonical resource names
+    local unique_resources=($(for v in "${RESOURCE_MAP[@]}"; do echo "$v"; done | sort -u))
+    
+    for canonical_resource in "${unique_resources[@]}"; do
+        echo "   🔸 $canonical_resource:"
+        echo "      Aliases: $(printf "%s " $(for k in "${!RESOURCE_MAP[@]}"; do [[ "${RESOURCE_MAP[$k]}" == "$canonical_resource" ]] && echo "$k"; done | sort))"
+        echo "      Sort fields: $(get_sort_fields "$canonical_resource" | tr '\n' ', ' | sed 's/, $//')"
+        echo
+    done
+
+    cat << EOF
+
+🎯 Namespace Options:
+    - Specific namespace: Use -n <namespace> (e.g., '-n kube-system', '-n default')
+    - All namespaces: Use -A or --all-namespaces
+    - Default: If no namespace flag specified, uses current context's default namespace
+
+💡 Tips:
+    - All sort fields are based on standard kubectl output columns
+    - Use 'name' as sort field for alphabetical sorting
+    - Use 'age' for chronological sorting (newest/oldest first)
+    - Resource aliases follow kubectl conventions (e.g., 'po' for pods, 'svc' for services)
+
+EOF
+    exit 0
 }
 
-if [[ "$1" = "kubectl" && "$2" = "get" ]];
-then
-  case "$3" in
-    pod|pods|po)
-      pod
-    ;;
-    deploy|deployments|deployment)
-      deployment
-    ;;
-    svc|service|services)
-      service
-    ;;
-    rs|replicaset)
-      replicaset
-    ;;
-    rc|replicationcontroller|replicationcontrollers)
-      replicationController
-    ;;
-    pv|persistentvolume|persistentvolumes)
-       persistentvolume
-    ;;
-    pvc|persistentvolumeclaim|persistentvolumeclaims)
-       persistentvolumeclaim
-    ;;
-    no|node|nodes)
-      node
-    ;;
-    *)
-      help
-    ;;
-  esac
+# Validate resource type and get canonical name
+validate_resource() {
+    local input_resource=$1
+    if [[ -n "${RESOURCE_MAP[$input_resource]}" ]]; then
+        resource_type="${RESOURCE_MAP[$input_resource]}"
+        return 0
+    else
+        echo "❌ Error: Unsupported resource type '$input_resource'"
+        echo "💡 Run 'kubesort kubectl get help' to see all supported resources"
+        exit 1
+    fi
+}
 
-  case "$#" in
-     4)
-     option3=default
-     kubectl get $option1 --sort-by=$option2 -n $option3 -o wide
-     ;;
-     5)
-     if [ $5 = "all" ];
-     then
-        option3="--all-namespaces"
-        kubectl get $option1 --sort-by=$option2 $option3 -o wide
-     else
-        option3=$5
-        kubectl get $option1 --sort-by=$option2 -n $option3 -o wide
-     fi
-     ;;
-     *)
-     help
-     ;;
-  esac
-else
-  help
-fi
+# Validate sort field
+validate_sort_field() {
+    local resource=$1
+    local field=$2
+    local key="$resource,$field"
+    
+    if [[ -n "${SORT_FIELDS[$key]}" ]]; then
+        sort_field="${SORT_FIELDS[$key]}"
+        return 0
+    else
+        echo "❌ Error: Invalid sort field '$field' for resource '$resource'"
+        echo "💡 Available sort fields for $resource: $(get_sort_fields "$resource" | tr '\n' ', ' | sed 's/, $//')"
+        exit 1
+    fi
+}
+
+# Execute kubectl with sorting
+execute_kubectl() {
+    local resource=$1
+    local sort_by=$2
+    local namespace_flag=$3
+    local namespace_value=$4
+    
+    local kubectl_cmd="kubectl get $resource --sort-by=$sort_by"
+    
+    # Handle namespace options
+    if [[ "$namespace_flag" == "--all-namespaces" ]]; then
+        kubectl_cmd="$kubectl_cmd --all-namespaces"
+    elif [[ "$namespace_flag" == "-n" && -n "$namespace_value" ]]; then
+        kubectl_cmd="$kubectl_cmd -n $namespace_value"
+    fi
+    # If no namespace specified, kubectl uses current context's default namespace
+    
+    # Add wide output for better visibility
+    kubectl_cmd="$kubectl_cmd -o wide"
+    
+    echo "🚀 Executing: $kubectl_cmd"
+    echo "─────────────────────────────────────────────────────────────"
+    
+    # Execute the command
+    eval "$kubectl_cmd"
+}
+
+# Parse namespace arguments
+parse_namespace_args() {
+    local -n args_ref=$1
+    local start_index=$2
+    local namespace_flag=""
+    local namespace_value=""
+    
+    # Check for namespace flags
+    local i=$start_index
+    while [[ $i -lt ${#args_ref[@]} ]]; do
+        if [[ "${args_ref[$i]}" == "--all-namespaces" || "${args_ref[$i]}" == "-A" ]]; then
+            namespace_flag="--all-namespaces"
+            break
+        elif [[ "${args_ref[$i]}" == "-n" && $((i+1)) -lt ${#args_ref[@]} ]]; then
+            namespace_flag="-n"
+            namespace_value="${args_ref[$((i+1))]}"
+            break
+        fi
+        ((i++))
+    done
+    
+    echo "$namespace_flag|$namespace_value"
+}
+
+# Main execution logic
+main() {
+    # Initialize resource definitions
+    init_resources
+    
+    # Check if basic kubectl get structure is correct
+    if [[ "$1" != "kubectl" || "$2" != "get" ]]; then
+        help
+    fi
+    
+    # Handle help requests
+    if [[ "$3" == "help" || "$3" == "" || "$4" == "help" || "$4" == "" ]]; then
+        help
+    fi
+    
+    # Parse basic arguments
+    local input_resource="$3"
+    local input_sort_field="$4"
+    
+    # Parse namespace arguments (starting from position 4, which is after sort_field)
+    local args=("$@")
+    local namespace_info=$(parse_namespace_args args 4)
+    local namespace_flag="${namespace_info%|*}"
+    local namespace_value="${namespace_info#*|}"
+    
+    # Validate inputs
+    validate_resource "$input_resource"
+    validate_sort_field "$resource_type" "$input_sort_field"
+    
+    # Execute the kubectl command
+    execute_kubectl "$resource_type" "$sort_field" "$namespace_flag" "$namespace_value"
+}
+
+# Run main function with all arguments
+main "$@"
